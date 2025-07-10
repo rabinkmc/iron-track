@@ -5,3 +5,4 @@ from .models import Lift
 class LiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lift
+        fields = "__all__"

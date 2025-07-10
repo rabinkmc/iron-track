@@ -1,4 +1,4 @@
 from django.urls import path
-from .views import hello
+from .views import lift_list
 
-urlpatterns = [path("", hello)]
+urlpatterns = [path("lift/", lift_list)]
