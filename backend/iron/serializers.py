@@ -5,4 +5,4 @@ from .models import Lift
 class LiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lift
-        fields = "__all__"
+        fields = ["id", "user", type", "reps", "sets", "weights"]
