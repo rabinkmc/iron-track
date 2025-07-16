@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users",
     "iron",
+    "common",
+    "api",
     "rest_framework",
     "django_extensions",
 ]
