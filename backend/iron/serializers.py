@@ -4,6 +4,12 @@ from .models import (
     WorkoutSession,
 )
 
+"""
+I don't want to use serializer to save and update the data, 
+but only to validate the data and serialize the response.
+
+"""
+
 
 class ExerciseSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
@@ -30,6 +36,10 @@ class WorkoutSessionSerializer(serializers.Serializer):
             }
             for exercise in obj.exercises.all()
         ]
+
+
+class WorkoutSessionCreateSerializer(serializers.Serializer):
+    notes = serializers.CharField(allow_blank=True, required=False)
 
 
 class WorkoutSessionExerciseSerializer(serializers.Serializer):
