@@ -1,4 +1,7 @@
 from django.urls import path
-from .views import lift_list
+from .views import ExerciseView, WorkoutSessionView
 
-urlpatterns = [path("lift/", lift_list)]
+urlpatterns = [
+    path("exercise/", ExerciseView.as_view(), name="exercise"),
+    path("session/", WorkoutSessionView.as_view(), name="workout_session"),
+]

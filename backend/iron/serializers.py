@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import (
     Exercise,
-    WorkoutSplit,
-    WorkoutSplitDay,
     WorkoutSession,
 )
 
@@ -10,16 +8,7 @@ from .models import (
 class ExerciseSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     muscle_targeted = serializers.CharField(max_length=100)
-
-
-class WorkoutSplitSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=100)
-    length = serializers.IntegerField()
-
-
-class WorkoutSplitDaySerializer(serializers.Serializer):
-    split = serializers.PrimaryKeyRelatedField(queryset=WorkoutSplit.objects.all())
-    name = serializers.CharField(max_length=100)
+    description = serializers.CharField(required=False, allow_blank=True)
 
 
 class WorkoutSessionSerializer(serializers.Serializer):
@@ -27,10 +16,20 @@ class WorkoutSessionSerializer(serializers.Serializer):
         queryset=WorkoutSession.objects.all(), source="user"
     )
     date = serializers.DateField()
-    split_day = serializers.PrimaryKeyRelatedField(
-        queryset=WorkoutSplitDay.objects.all()
-    )
     notes = serializers.CharField(allow_blank=True, required=False)
+    exercises = serializers.SerializerMethodField()
+
+    def get_exercises(self, obj):
+        return [
+            {
+                "name": exercise.exercise.name,
+                "order": exercise.order,
+                "sets": exercise.set,
+                "reps": exercise.reps,
+                "weight": exercise.weight,
+            }
+            for exercise in obj.exercises.all()
+        ]
 
 
 class WorkoutSessionExerciseSerializer(serializers.Serializer):

@@ -7,6 +7,9 @@ User = get_user_model()
 """
 objective: to allow users to see their workout history, including exercises performed, sets, reps, and weights.
 Also, they can know which workout they have in the future.
+
+
+first let's just try to make sure we can track the exercises they do. 
 """
 
 
@@ -19,33 +22,12 @@ class Exercise(BaseModel):
         return self.name
 
 
-class WorkoutSplit(BaseModel):
-    name = models.CharField(max_length=100)
-    # Number of distinct workout days in the split (e.g., 3-day split)
-    length = models.IntegerField()
-    description = models.TextField(blank=True, null=True)
-
-
-class WorkoutSplitDay(BaseModel):
-    split = models.ForeignKey(
-        WorkoutSplit, on_delete=models.CASCADE, related_name="days"
-    )
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-
-
 class WorkoutSession(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="workout_sessions"
     )
     date = models.DateField()
-    split_day = models.ForeignKey(
-        WorkoutSplitDay, on_delete=models.CASCADE, related_name="sessions"
-    )
     notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.date} - {self.split_day.name}"
 
 
 class WorkoutSessionExercise(BaseModel):
