@@ -1,51 +1,94 @@
+from datetime import date
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from rest_framework import status
 
 from iron.models import Exercise
-from iron.serializers import ExerciseSerializer, WorkoutSessionSerializer
+from iron.serializers import (
+    ExerciseSerializer,
+    WorkoutSessionCreateSerializer,
+    WorkoutSessionSerializer,
+)
+from django.shortcuts import get_object_or_404
 
 
-class ExerciseView(APIView):
-    def get(self, _):
-        exercises = ExerciseSerializer(Exercise.objects.all(), many=True)
+class ExerciseViewSet(ViewSet):
+    def list(self, _):
+        ser = ExerciseSerializer(Exercise.objects.all(), many=True)
+        return Response(ser.data)
+
+    def retrieve(self, request, pk):
+        exercise = get_object_or_404(Exercise, pk=pk)
+        exercises = ExerciseSerializer(exercise)
         return Response(exercises.data)
 
-    def post(self, request):
-        data = ExerciseSerializer(data=request.data)
-        if not data.is_valid():
-            return Response(data.errors, status=400)
-        data.save()
-        return Response(data.data, status=201)
-
-    def put(self, request):
-        exercise = Exercise.objects.filter(id=request.data["id"]).first()
-        ser = ExerciseSerializer(exercise, data=request.data)
-        if not exercise:
-            return Response({"error": "Exercise not found"}, status=404)
+    def create(self, request):
+        ser = ExerciseSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=400)
-        ser.save()
-        return Response(ser.data, status=200)
+        instance = Exercise.objects.create(**ser.data)
+        data = ExerciseSerializer(instance).data
+        return Response(data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, pk):
-        try:
-            exercise = Exercise.objects.get(pk=pk)
-            exercise.delete()
-            return Response(status=204)
-        except Exercise.DoesNotExist:
+    def update(self, request, pk):
+        exercise = Exercise.objects.filter(pk=pk).first()
+        if not exercise:
             return Response({"error": "Exercise not found"}, status=404)
+        ser = ExerciseSerializer(data=request.data)
+        if not ser.is_valid():
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        data = ser.data
+        exercise.name = data["name"]
+        exercise.muscle_targeted = data["muscle_targeted"]
+        exercise.description = data.get("description", "")
+        exercise.save()
+        resp = ExerciseSerializer(exercise)
+        return Response(resp.data, status=200)
+
+    def destroy(self, request, pk):
+        exercise = get_object_or_404(Exercise, pk=pk)
+        exercise.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class WorkoutSessionView(APIView):
-    def get(self, request):
+class WorkoutSessionViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
         user = request.user
-        workout_sessions = user.workout_sessions.select_related("exercises").all()
+        workout_sessions = user.workout_sessions.prefetch_related("exercises").all()
         ser = WorkoutSessionSerializer(workout_sessions, many=True)
         return Response(ser.data)
 
-    def post(self, request):
-        ser = WorkoutSessionSerializer(data=request.data)
+    def retreive(self, request, pk):
+        workout_session = request.user.workout_sessions.filter(pk=pk).first()
+        if not workout_session:
+            return Response(
+                {"error": "Workout session not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        ser = WorkoutSessionSerializer(workout_session)
+        return Response(ser.data)
+
+    def create(self, request):
+        ser = WorkoutSessionCreateSerializer(data=request.data)
+        if not ser.is_valid():
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        today = date.today()
+        user = request.user
+        workout_session = user.workout_sessions.create(
+            date=today, notes=ser.data.get("notes", "")
+        )
+        data = WorkoutSessionSerializer(workout_session).data
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk):
+        workout_session = request.user.workout_sessions.filter(pk=pk).first()
+        if not workout_session:
+            return Response({"error": "Workout session not found"}, status=404)
+        ser = WorkoutSessionSerializer(workout_session, data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=400)
-        ser.save()
-        return Response(ser.data, status=201)
+        workout_session.notes = ser.data.get("notes", "")
+        workout_session.save()
+        return Response(ser.data)

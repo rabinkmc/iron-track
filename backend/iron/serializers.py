@@ -12,15 +12,14 @@ but only to validate the data and serialize the response.
 
 
 class ExerciseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)
     muscle_targeted = serializers.CharField(max_length=100)
     description = serializers.CharField(required=False, allow_blank=True)
 
 
 class WorkoutSessionSerializer(serializers.Serializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=WorkoutSession.objects.all(), source="user"
-    )
+    user = serializers.PrimaryKeyRelatedField(queryset=WorkoutSession.objects.all())
     date = serializers.DateField()
     notes = serializers.CharField(allow_blank=True, required=False)
     exercises = serializers.SerializerMethodField()
