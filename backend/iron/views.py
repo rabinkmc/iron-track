@@ -12,6 +12,8 @@ from iron.serializers import (
 )
 from django.shortcuts import get_object_or_404
 
+from iron.services import update_exercise
+
 
 class ExerciseViewSet(ViewSet):
     def list(self, _):
@@ -27,9 +29,8 @@ class ExerciseViewSet(ViewSet):
         ser = ExerciseSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=400)
-        instance = Exercise.objects.create(**ser.data)
-        data = ExerciseSerializer(instance).data
-        return Response(data, status=status.HTTP_201_CREATED)
+        Exercise.objects.create(**ser.data)
+        return Response(status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
         exercise = Exercise.objects.filter(pk=pk).first()
@@ -38,13 +39,8 @@ class ExerciseViewSet(ViewSet):
         ser = ExerciseSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-        data = ser.data
-        exercise.name = data["name"]
-        exercise.muscle_targeted = data["muscle_targeted"]
-        exercise.description = data.get("description", "")
-        exercise.save()
-        resp = ExerciseSerializer(exercise)
-        return Response(resp.data, status=200)
+        update_exercise(exercise, ser.data)
+        return Response(status=200)
 
     def destroy(self, request, pk):
         exercise = get_object_or_404(Exercise, pk=pk)
