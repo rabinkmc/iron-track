@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.environ["DEBUG"]
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "54.172.95.171"]
 
 
 # Application definition
@@ -145,3 +145,38 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# settings.py
+import os
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,  # Keep Django's default loggers
+#     "formatters": {
+#         "verbose": {
+#             "format": "{asctime} {levelname} {name} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": os.path.join(BASE_DIR, "logs/django.log"),
+#             "formatter": "verbose",
+#         },
+#         "error_file": {
+#             "level": "ERROR",
+#             "class": "logging.FileHandler",
+#             "filename": os.path.join(BASE_DIR, "logs/django_error.log"),
+#             "formatter": "verbose",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["file", "error_file"],
+#             "level": "INFO",
+#             "propagate": True,
+#         },
+#     },
+# }
