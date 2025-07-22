@@ -2,4 +2,6 @@
 1. users -> workouts -> their exercises
 
 
-users can use their previous workouts as templates
+
+1. users can create their workouts
+2. users can 
