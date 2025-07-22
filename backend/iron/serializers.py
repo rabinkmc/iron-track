@@ -29,8 +29,6 @@ class WorkoutSessionSerializer(serializers.Serializer):
         return [
             {
                 "name": exercise.exercise.name,
-                "order": exercise.order,
-                "sets": exercise.set,
                 "reps": exercise.reps,
                 "weight": exercise.weight,
             }
