@@ -149,36 +149,21 @@ CORS_ALLOW_ALL_ORIGINS = True
 # settings.py
 import os
 
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,  # Keep Django's default loggers
-#     "formatters": {
-#         "verbose": {
-#             "format": "{asctime} {levelname} {name} {message}",
-#             "style": "{",
-#         },
-#     },
-#     "handlers": {
-#         "file": {
-#             "level": "INFO",
-#             "class": "logging.FileHandler",
-#             "filename": os.path.join(BASE_DIR, "logs/django.log"),
-#             "formatter": "verbose",
-#         },
-#         "error_file": {
-#             "level": "ERROR",
-#             "class": "logging.FileHandler",
-#             "filename": os.path.join(BASE_DIR, "logs/django_error.log"),
-#             "formatter": "verbose",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["file", "error_file"],
-#             "level": "INFO",
-#             "propagate": True,
-#         },
-#     },
-# }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "logfile": {
+            "class": "logging.FileHandler",
+            "filename": "server.log",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["logfile"],
+        },
+    },
+}
+
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
