@@ -19,6 +19,7 @@ class ExerciseSerializer(serializers.Serializer):
 
 
 class WorkoutSessionSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     user = serializers.PrimaryKeyRelatedField(queryset=WorkoutSession.objects.all())
     date = serializers.DateField()
     notes = serializers.CharField(allow_blank=True, required=False)
@@ -46,8 +47,19 @@ class WorkoutSessionExerciseSerializer(serializers.Serializer):
         queryset=WorkoutSession.objects.all()
     )
     exercise = serializers.PrimaryKeyRelatedField(queryset=Exercise.objects.all())
-    order = serializers.IntegerField()
-    sets = serializers.IntegerField()
-    reps = serializers.IntegerField()
-    weight = serializers.IntegerField()
     notes = serializers.CharField(allow_blank=True, required=False)
+
+
+class WorkoutSessionExerciseSetSerializer(serializers.Serializer):
+    session_exercise = serializers.PrimaryKeyRelatedField(
+        queryset=WorkoutSession.objects.all()
+    )
+    reps = serializers.IntegerField()
+    weight = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate(self, attrs):
+        if attrs["reps"] <= 0 or attrs["weight"] < 0:
+            raise serializers.ValidationError(
+                "Reps must be greater than 0 and weight cannot be negative."
+            )
+        return attrs

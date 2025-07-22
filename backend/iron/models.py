@@ -35,11 +35,18 @@ class WorkoutSessionExercise(BaseModel):
         WorkoutSession, on_delete=models.CASCADE, related_name="exercises"
     )
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
-    order = models.IntegerField()
-    sets = models.PositiveSmallIntegerField()
-    reps = models.PositiveSmallIntegerField()
-    weight = models.PositiveSmallIntegerField()
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.workout_session} - {self.exercise.name}"
+
+
+class WorkoutSessionExerciseSet(BaseModel):
+    session_exercise = models.ForeignKey(
+        WorkoutSessionExercise, on_delete=models.CASCADE, related_name="sets"
+    )
+    reps = models.IntegerField()
+    weight = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.session_exercise} - {self.reps} reps at {self.weight}kg"
