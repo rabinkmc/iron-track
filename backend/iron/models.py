@@ -29,6 +29,9 @@ class WorkoutSession(BaseModel):
     date = models.DateField()
     notes = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.user.username} - {self.date}"
+
 
 class WorkoutSessionExercise(BaseModel):
     workout_session = models.ForeignKey(
