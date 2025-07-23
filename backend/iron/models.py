@@ -35,7 +35,7 @@ class WorkoutSession(BaseModel):
 
 class WorkoutSessionExercise(BaseModel):
     workout_session = models.ForeignKey(
-        WorkoutSession, on_delete=models.CASCADE, related_name="exercises"
+        WorkoutSession, on_delete=models.CASCADE, related_name="session_exercises"
     )
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     notes = models.TextField(blank=True, null=True)

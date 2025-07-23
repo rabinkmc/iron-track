@@ -1,4 +1,3 @@
-from django.urls import include, path
 from .views import (
     ExerciseViewSet,
     WorkoutSessionExerciseSetViewSet,
@@ -17,7 +16,7 @@ router.register(
     basename="session-exercise",
 )
 router.register(
-    "exercise-set/<int:id>", WorkoutSessionExerciseSetViewSet, basename="exercise-set"
+    "exercise-set/", WorkoutSessionExerciseSetViewSet, basename="exercise-set"
 )
 
 urlpatterns = router.urls

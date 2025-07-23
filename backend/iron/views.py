@@ -1,14 +1,13 @@
 from django.shortcuts import get_object_or_404
 from datetime import date
 
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework import status
 
 from iron.models import (
     Exercise,
-    WorkoutSession,
     WorkoutSessionExercise,
     WorkoutSessionExerciseSet,
 )
@@ -57,11 +56,13 @@ class ExerciseViewSet(ViewSet):
 
 
 class WorkoutSessionViewSet(ViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         user = request.user
-        workout_sessions = user.workout_sessions.prefetch_related("exercises").all()
+        workout_sessions = user.workout_sessions.prefetch_related(
+            "session_exercises", "session_exercises__sets"
+        ).all()
         ser = WorkoutSessionSerializer(workout_sessions, many=True)
         return Response(ser.data)
 
