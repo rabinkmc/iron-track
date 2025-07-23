@@ -11,12 +11,12 @@ router = DefaultRouter()
 router.register("exercise", ExerciseViewSet, basename="exercise")
 router.register("session", WorkoutSessionViewSet, basename="session")
 router.register(
-    "session-exercise/",
+    "session-exercise",
     WorkoutSessionExercisesViewSet,
     basename="session-exercise",
 )
 router.register(
-    "exercise-set/", WorkoutSessionExerciseSetViewSet, basename="exercise-set"
+    "exercise-set", WorkoutSessionExerciseSetViewSet, basename="exercise-set"
 )
 
 urlpatterns = router.urls
