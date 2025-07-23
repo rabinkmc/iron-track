@@ -99,13 +99,14 @@ class WorkoutSessionViewSet(ViewSet):
             return Response(ser.errors, status=400)
         workout_session.notes = ser.validated_data.get("notes", "")
         if ser.data.get("date"):
-            workout_session.dates = ser.validated_data["date"]
+            workout_session.date = ser.validated_data["date"]
         workout_session.save()
         return Response(ser.data)
 
 
 class WorkoutSessionExercisesViewSet(ViewSet):
-    def create(self, request, pk):
+    def create(self, request):
+        pk = request.data["workout_session"]
         workout_session = request.user.workout_sessions.filter(pk=pk).first()
         if not workout_session:
             return Response(
@@ -122,7 +123,7 @@ class WorkoutSessionExercisesViewSet(ViewSet):
         )
         return Response(status=status.HTTP_201_CREATED)
 
-    def list(self, request, pk):
+    def list(self, request):
         excercise = WorkoutSessionExercise.objects.all()
         if not excercise:
             return Response(

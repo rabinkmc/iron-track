@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import (
+    Exercise,
     WorkoutSession,
 )
 from common.serializers import DynamicFieldsSerializer
@@ -62,7 +63,7 @@ class WorkoutSessionExerciseCreateSerializer(serializers.Serializer):
     workout_session = serializers.PrimaryKeyRelatedField(
         queryset=WorkoutSession.objects.all()
     )
-    exercise = serializers.PrimaryKeyRelatedField(queryset=WorkoutSession.objects.all())
+    exercise = serializers.PrimaryKeyRelatedField(queryset=Exercise.objects.all())
     notes = serializers.CharField(allow_blank=True, required=False)
 
 
