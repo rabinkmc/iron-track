@@ -2,7 +2,12 @@ from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from iron.models import Exercise, WorkoutSession, WorkoutSessionExercise
+from iron.models import (
+    Exercise,
+    WorkoutSession,
+    WorkoutSessionExercise,
+    WorkoutSessionExerciseSet,
+)
 from iron.serializers import WorkoutSessionExerciseSetCreateSerializer
 
 User = get_user_model()
@@ -141,3 +146,99 @@ class WorkoutSessionExerciseTest(APITestCase):
                 workout_session=session, exercise=exercise
             ).exists()
         )
+
+    def test_workout_session_exercise_update(self):
+        session = WorkoutSession.objects.create(user=self.user, date="2023-10-01")
+        exercise = Exercise.objects.create(
+            name="Squat",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        session_exercise = WorkoutSessionExercise.objects.create(
+            workout_session=session, exercise=exercise, notes="Initial notes"
+        )
+
+        url = reverse(
+            "iron:session-exercise-detail", kwargs={"pk": session_exercise.pk}
+        )
+        response = self.client.put(
+            url,
+            data={
+                "workout_session": session.pk,
+                "notes": "Updated notes",
+                "exercise": exercise.pk,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        session_exercise.refresh_from_db()
+        self.assertEqual(session_exercise.notes, "Updated notes")
+
+
+class WorkoutSessionExcerciseSetTest(APITestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(username="admin", password="admin")  # type: ignore
+        self.client.force_login(self.user)
+
+    def test_workout_session_exercise_set_create(self):
+        """
+        Test creating a workout session exercise set
+        """
+        session = WorkoutSession.objects.create(user=self.user, date="2023-10-01")
+        exercise = Exercise.objects.create(
+            name="Deadlift",
+            muscle_targeted="Back",
+            description="A compound exercise for the back.",
+        )
+        session_exercise = WorkoutSessionExercise.objects.create(
+            workout_session=session, exercise=exercise
+        )
+
+        url = reverse("iron:exercise-set-list")
+        response = self.client.post(
+            url,
+            data={
+                "session_exercise": session_exercise.pk,
+                "reps": 10,
+                "weight": 100.0,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(
+            WorkoutSessionExerciseSet.objects.filter(
+                session_exercise=session_exercise, reps=10, weight=100.0
+            ).exists()
+        )
+
+    def test_workout_session_exercise_set_update(self):
+        session = WorkoutSession.objects.create(user=self.user, date="2023-10-01")
+        exercise = Exercise.objects.create(
+            name="Deadlift",
+            muscle_targeted="Back",
+            description="A compound exercise for the back.",
+        )
+        session_exercise = WorkoutSessionExercise.objects.create(
+            workout_session=session, exercise=exercise
+        )
+        session_exercise_set = WorkoutSessionExerciseSet.objects.create(
+            session_exercise=session_exercise, reps=10, weight=100.0
+        )
+
+        url = reverse(
+            "iron:exercise-set-detail", kwargs={"pk": session_exercise_set.pk}
+        )
+        response = self.client.put(
+            url,
+            data={
+                "session_exercise": session_exercise.pk,
+                "reps": 12,
+                "weight": 110.0,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        session_exercise_set.refresh_from_db()
+        self.assertEqual(session_exercise_set.reps, 12)
+        self.assertEqual(session_exercise_set.weight, 110.0)

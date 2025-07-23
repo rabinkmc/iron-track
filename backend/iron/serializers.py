@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import (
     Exercise,
     WorkoutSession,
+    WorkoutSessionExercise,
 )
 from common.serializers import DynamicFieldsSerializer
 
@@ -35,7 +36,7 @@ class WorkoutSessionExerciseSetSerializer(DynamicFieldsSerializer):
 
 class WorkoutSessionExerciseSetCreateSerializer(serializers.Serializer):
     session_exercise = serializers.PrimaryKeyRelatedField(
-        queryset=WorkoutSession.objects.all()
+        queryset=WorkoutSessionExercise.objects.all()
     )
     reps = serializers.IntegerField()
     weight = serializers.DecimalField(max_digits=10, decimal_places=2)
