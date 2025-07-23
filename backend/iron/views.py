@@ -15,7 +15,9 @@ from iron.serializers import (
     ExerciseCreateSerializer,
     ExerciseSerializer,
     WorkoutSessionCreateSerializer,
+    WorkoutSessionExerciseCreateSerializer,
     WorkoutSessionExerciseSerializer,
+    WorkoutSessionExerciseSetCreateSerializer,
     WorkoutSessionExerciseSetSerializer,
     WorkoutSessionSerializer,
 )
@@ -80,10 +82,10 @@ class WorkoutSessionViewSet(ViewSet):
         ser = WorkoutSessionCreateSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-        today = date.today()
+        workout_date = ser.validated_data.get("date") or date.today()
         user = request.user
         workout_session = user.workout_sessions.create(
-            date=today, notes=ser.data.get("notes", "")
+            date=workout_date, notes=ser.data.get("notes", "")
         )
         data = WorkoutSessionSerializer(workout_session).data
         return Response(data, status=status.HTTP_201_CREATED)
@@ -92,10 +94,12 @@ class WorkoutSessionViewSet(ViewSet):
         workout_session = request.user.workout_sessions.filter(pk=pk).first()
         if not workout_session:
             return Response({"error": "Workout session not found"}, status=404)
-        ser = WorkoutSessionSerializer(workout_session, data=request.data)
+        ser = WorkoutSessionCreateSerializer(workout_session, data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=400)
-        workout_session.notes = ser.data.get("notes", "")
+        workout_session.notes = ser.validated_data.get("notes", "")
+        if ser.data.get("date"):
+            workout_session.dates = ser.validated_data["date"]
         workout_session.save()
         return Response(ser.data)
 
@@ -107,7 +111,7 @@ class WorkoutSessionExercisesViewSet(ViewSet):
             return Response(
                 {"error": "Workout session not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        ser = WorkoutSessionExerciseSerializer(data=request.data)
+        ser = WorkoutSessionExerciseCreateSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
         exercise = ser.validated_data["exercise"]
@@ -143,7 +147,7 @@ class WorkoutSessionExerciseSetViewSet(ViewSet):
                 {"error": "Workout session exercise not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        ser = WorkoutSessionExerciseSetSerializer(data=request.data)
+        ser = WorkoutSessionExerciseSetCreateSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
         WorkoutSessionExerciseSet(

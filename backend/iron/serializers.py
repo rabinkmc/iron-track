@@ -77,4 +77,5 @@ class WorkoutSessionSerializer(DynamicFieldsSerializer):
 
 
 class WorkoutSessionCreateSerializer(DynamicFieldsSerializer):
+    date = serializers.DateField(required=False)
     notes = serializers.CharField(allow_blank=True, required=False)
