@@ -3,4 +3,3 @@ def update_exercise(exercise, data):
     exercise.muscle_targeted = data["muscle_targeted"]
     exercise.description = data.get("description", "")
     exercise.save()
-    return exercise

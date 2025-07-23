@@ -12,6 +12,7 @@ from iron.models import (
     WorkoutSessionExerciseSet,
 )
 from iron.serializers import (
+    ExerciseCreateSerializer,
     ExerciseSerializer,
     WorkoutSessionCreateSerializer,
     WorkoutSessionExerciseSerializer,
@@ -33,7 +34,7 @@ class ExerciseViewSet(ViewSet):
         return Response(exercises.data)
 
     def create(self, request):
-        ser = ExerciseSerializer(data=request.data)
+        ser = ExerciseCreateSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=400)
         Exercise.objects.create(**ser.data)
@@ -43,7 +44,7 @@ class ExerciseViewSet(ViewSet):
         exercise = Exercise.objects.filter(pk=pk).first()
         if not exercise:
             return Response({"error": "Exercise not found"}, status=404)
-        ser = ExerciseSerializer(data=request.data)
+        ser = ExerciseCreateSerializer(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
         update_exercise(exercise, ser.data)

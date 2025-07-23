@@ -7,7 +7,6 @@ from common.serializers import DynamicFieldsSerializer
 """
 I don't want to use serializer to save and update the data, 
 but only to validate the data and serialize the response.
-
 """
 
 
@@ -18,8 +17,22 @@ class ExerciseSerializer(DynamicFieldsSerializer):
     description = serializers.CharField(required=False, allow_blank=True)
 
 
+class ExerciseCreateSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    muscle_targeted = serializers.CharField(max_length=100)
+    description = serializers.CharField(required=False, allow_blank=True)
+
+
 class WorkoutSessionExerciseSetSerializer(DynamicFieldsSerializer):
     id = serializers.IntegerField(read_only=True)
+    session_exercise = serializers.PrimaryKeyRelatedField(
+        queryset=WorkoutSession.objects.all()
+    )
+    reps = serializers.IntegerField()
+    weight = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+class WorkoutSessionExerciseSetCreateSerializer(serializers.Serializer):
     session_exercise = serializers.PrimaryKeyRelatedField(
         queryset=WorkoutSession.objects.all()
     )
@@ -43,6 +56,14 @@ class WorkoutSessionExerciseSerializer(DynamicFieldsSerializer):
     sets = WorkoutSessionExerciseSetSerializer(
         fields=["id", "reps", "weight"], many=True, read_only=True
     )
+
+
+class WorkoutSessionExerciseCreateSerializer(serializers.Serializer):
+    workout_session = serializers.PrimaryKeyRelatedField(
+        queryset=WorkoutSession.objects.all()
+    )
+    exercise = serializers.PrimaryKeyRelatedField(queryset=WorkoutSession.objects.all())
+    notes = serializers.CharField(allow_blank=True, required=False)
 
 
 class WorkoutSessionSerializer(DynamicFieldsSerializer):
