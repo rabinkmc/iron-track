@@ -53,16 +53,19 @@
 
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
+import { inject } from "vue";
+
+const axios = inject("axios");
 const username = ref("");
 const password = ref("");
 const loginForm = ref(null);
 const handleLogin = async () => {
-  const response = await axios.post("/auth/api/token/", {
+  const response = await axios.post("/token/", {
     username: username.value,
     password: password.value,
   });
-  console.log(response.data);
+  localStorage.setItem("access_token", response.data.access_token);
+  localStorage.setItem("refresh_token", response.data.refresh_token);
 };
 </script>
 
