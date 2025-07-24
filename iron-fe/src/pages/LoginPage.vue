@@ -54,18 +54,21 @@
 <script setup>
 import { ref } from "vue";
 import { inject } from "vue";
+import { useRouter } from "vue-router";
 
 const axios = inject("axios");
 const username = ref("");
 const password = ref("");
 const loginForm = ref(null);
+const router = useRouter();
 const handleLogin = async () => {
   const response = await axios.post("/token/", {
     username: username.value,
     password: password.value,
   });
-  localStorage.setItem("access_token", response.data.access_token);
-  localStorage.setItem("refresh_token", response.data.refresh_token);
+  localStorage.setItem("access_token", response.data.access);
+  localStorage.setItem("refresh_token", response.data.refresh);
+  router.push({ name: "home" });
 };
 </script>
 
