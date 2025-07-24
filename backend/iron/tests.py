@@ -8,7 +8,6 @@ from iron.models import (
     WorkoutSessionExercise,
     WorkoutSessionExerciseSet,
 )
-from iron.serializers import WorkoutSessionExerciseSetCreateSerializer
 
 User = get_user_model()
 

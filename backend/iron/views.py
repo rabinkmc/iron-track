@@ -38,16 +38,14 @@ class ExerciseViewSet(ViewSet):
 
     def create(self, request):
         ser = ExerciseCreateSerializer(data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=400)
+        ser.is_valid(raise_exception=True)
         Exercise.objects.create(**ser.data)
         return Response(status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
         exercise = get_object_or_404(Exercise, pk=pk)
         ser = ExerciseCreateSerializer(data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         update_exercise(exercise, ser.data)
         return Response(status=200)
 
@@ -75,8 +73,7 @@ class WorkoutSessionViewSet(ViewSet):
 
     def create(self, request):
         ser = WorkoutSessionCreateSerializer(data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         workout_date = ser.validated_data.get("date") or date.today()
         user = request.user
         workout_session = user.workout_sessions.create(
@@ -88,8 +85,7 @@ class WorkoutSessionViewSet(ViewSet):
     def update(self, request, pk):
         workout_session = get_object_or_404(request.user.workout_sessions, pk=pk)
         ser = WorkoutSessionCreateSerializer(workout_session, data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=400)
+        ser.is_valid(raise_exception=True)
         workout_session.notes = ser.validated_data.get("notes", "")
         if ser.data.get("date"):
             workout_session.date = ser.validated_data["date"]
@@ -103,8 +99,7 @@ class WorkoutSessionExercisesViewSet(ViewSet):
             request.user.workout_sessions, pk=request.data.get("workout_session")
         )
         ser = WorkoutSessionExerciseCreateSerializer(data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         exercise = ser.validated_data["exercise"]
         WorkoutSessionExercise.objects.create(
             workout_session=workout_session,
@@ -118,8 +113,7 @@ class WorkoutSessionExercisesViewSet(ViewSet):
         ser = WorkoutSessionExerciseCreateSerializer(
             session_exercise, data=request.data
         )
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         session_exercise.exercise = ser.validated_data["exercise"]
         session_exercise.notes = ser.validated_data.get("notes", "")
         session_exercise.save()
@@ -144,8 +138,7 @@ class WorkoutSessionExerciseSetViewSet(ViewSet):
             WorkoutSessionExercise, pk=request.data.get("session_exercise")
         )
         ser = WorkoutSessionExerciseSetCreateSerializer(data=request.data)
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         WorkoutSessionExerciseSet.objects.create(
             session_exercise=session_exercise,
             reps=ser.validated_data["reps"],
@@ -158,8 +151,7 @@ class WorkoutSessionExerciseSetViewSet(ViewSet):
         ser = WorkoutSessionExerciseSetCreateSerializer(
             session_exercise_set, data=request.data
         )
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         session_exercise_set.reps = ser.validated_data["reps"]
         session_exercise_set.weight = ser.validated_data["weight"]
         session_exercise_set.save()
