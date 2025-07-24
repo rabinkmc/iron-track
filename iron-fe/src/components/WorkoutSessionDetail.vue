@@ -1,79 +1,75 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 space-y-6" v-if="session">
-    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-      <h1 class="text-2xl font-bold mb-2">Workout Session</h1>
-      <p class="text-gray-600">📅 {{ session.date }}</p>
-      <p class="text-gray-800 mt-2 whitespace-pre-line">{{ session.notes }}</p>
-    </div>
-
-    <div
-      v-for="(entry, index) in session.session_exercises"
-      :key="index"
-      class="bg-white shadow-sm rounded-xl p-4 border border-gray-200"
+  <v-container>
+    <v-data-table
+      :items="tableItems"
+      class="elevation-1"
+      disable-pagination
+      hide-default-footer
     >
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <h2 class="text-xl font-semibold capitalize">
-            {{ entry.exercise.name }}
-          </h2>
-          <p class="text-sm text-gray-500">
-            💪 {{ entry.exercise.muscle_targeted }}
-          </p>
-        </div>
-      </div>
-
-      <p v-if="entry.notes" class="text-gray-700 italic mt-1">
-        📝 {{ entry.notes }}
-      </p>
-
-      <table
-        class="w-full mt-4 border border-gray-200 rounded-lg overflow-hidden text-sm"
-      >
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="p-2">Set</th>
-            <th class="p-2">Reps</th>
-            <th class="p-2">Weight (kg)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(set, setIndex) in entry.sets"
-            :key="set.id"
-            class="border-t"
-          >
-            <td class="p-2">{{ setIndex + 1 }}</td>
-            <td class="p-2">{{ set.reps }}</td>
-            <td class="p-2">{{ set.weight }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div v-else class="text-center py-10">
-    <p>Loading workout session...</p>
-  </div>
+      <template #item="{ item }">
+        <tr>
+          <td>{{ item.sn }}</td>
+          <td>{{ item.exercise }}</td>
+          <td v-for="n in maxSets" :key="n">
+            <div v-if="item.sets[n - 1]">
+              {{ item.sets[n - 1].reps }} / {{ item.sets[n - 1].weight }}
+            </div>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
+  </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { inject } from "vue";
+import { ref, inject, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 const axios = inject("axios");
+const route = useRoute();
+const apiUrl = `/iron/session/${route.params.id}`;
 
-const session = ref(null);
+const sessionData = ref(null);
+const maxSets = 5;
 
-const fetchSession = async () => {
+const headers = [
+  { text: "SN", value: "sn", width: "50px" },
+  { text: "Exercise", value: "exercise" },
+  ...Array.from({ length: maxSets }, (_, i) => ({
+    text: `Set ${i + 1}`,
+    value: `set${i + 1}`,
+  })),
+];
+
+// Process API data into table format
+const tableItems = ref([]);
+
+function processData(data) {
+  return data.session_exercises.map((ex, index) => ({
+    sn: index + 1,
+    exercise: ex.exercise.name,
+    sets: ex.sets.slice(0, maxSets).map((set) => ({
+      reps: set.reps,
+      weight: set.weight,
+    })),
+  }));
+}
+
+// On mounted, fetch data from API
+onMounted(async () => {
   try {
-    const response = await axios.get("/iron/session/1/");
-    session.value = response.data;
+    const response = await axios.get(apiUrl);
+    sessionData.value = response.data;
+    tableItems.value = processData(sessionData.value);
   } catch (error) {
-    console.error("Failed to fetch session data:", error);
+    console.error("Error fetching workout session:", error);
   }
-};
-
-onMounted(() => {
-  fetchSession();
 });
 </script>
+
+<style scoped>
+td {
+  padding: 8px 12px;
+  text-align: center;
+}
+</style>

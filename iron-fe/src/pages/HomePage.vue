@@ -9,7 +9,7 @@
       <v-col cols="12" md="8">
         <v-row dense>
           <v-col v-for="session in sessions" :key="session.id" cols="12" md="6">
-            <v-card outlined class="pa-4" @click="loadTemplate(session)">
+            <v-card outlined class="pa-4" @click="loadSession(session)">
               <v-card-title class="headline">
                 Workout Session {{ formatDate(session.date) }}
               </v-card-title>
@@ -117,8 +117,8 @@ const beginWorkout = () => {
   router.push({ name: "workout-create" });
 };
 
-const loadTemplate = (session) => {
-  router.push({ name: "workout-create", query: { templateId: session.id } });
+const loadSession = (session) => {
+  router.push({ name: "workout-session-detail", params: { id: session.id } });
 };
 
 const logout = () => {

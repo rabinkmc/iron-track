@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import WorkoutSession from "../pages/WorkoutSession.vue";
+import WorkoutSessionDetail from "../components/WorkoutSessionDetail.vue";
 
 const routes = [
   {
@@ -12,10 +13,15 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/workout-session",
-    name: "workout-session",
+    path: "/workout-session/add",
+    name: "workout-create",
     component: WorkoutSession,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/workout-session/:id",
+    name: "workout-session-detail",
+    component: WorkoutSessionDetail,
   },
   {
     path: "/login",
@@ -36,7 +42,7 @@ router.beforeEach((to, from, next) => {
   if (to.name !== "login" && !isAuthenticated) {
     next({ name: "login" });
   } else if (to.name === "login" && isAuthenticated) {
-    next({ name: "home" }); // optional: redirect logged-in user away from login
+    next({ name: "home" });
   } else {
     next();
   }
