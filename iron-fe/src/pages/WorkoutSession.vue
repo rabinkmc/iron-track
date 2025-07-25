@@ -20,7 +20,7 @@
             <v-card-subtitle>Exercises</v-card-subtitle>
 
             <div
-              v-for="(exerciseEntry, index) in form.exercises"
+              v-for="(exerciseEntry, index) in form.session_exercises"
               :key="index"
               class="mb-6"
             >
@@ -105,9 +105,10 @@ const axios = inject("axios");
 const router = useRouter();
 
 const form = ref({
+  user: localStorage.getItem("user_id"),
   date: new Date().toISOString().slice(0, 10),
   notes: "",
-  exercises: [],
+  session_exercises: [],
 });
 
 const exerciseOptions = ref([]);
@@ -126,7 +127,7 @@ onMounted(() => {
 });
 
 const addExercise = () => {
-  form.value.exercises.push({
+  form.value.session_exercises.push({
     exercise: null,
     notes: "",
     sets: [{ reps: 10, weight: 0 }],
@@ -134,41 +135,22 @@ const addExercise = () => {
 };
 
 const removeSet = (exerciseIndex, setIndex) => {
-  form.value.exercises[exerciseIndex].sets.splice(setIndex, 1);
+  form.value.session_exercises[exerciseIndex].sets.splice(setIndex, 1);
 };
 
 const addSet = (exerciseIndex) => {
-  form.value.exercises[exerciseIndex].sets.push({ reps: 10, weight: 0 });
+  form.value.session_exercises[exerciseIndex].sets.push({
+    reps: 10,
+    weight: 0,
+  });
 };
 
 const submitSession = async () => {
   try {
-    // Step 1: Create workout session
-    const sessionRes = await axios.post("/iron/session/", {
-      date: form.value.date,
-      notes: form.value.notes,
-    });
-
-    const sessionId = sessionRes.data.id;
-
-    // Step 2: Create exercises and sets
-    for (const ex of form.value.exercises) {
-      const sessionExerciseRes = await axios.post("/iron/session-exercise/", {
-        workout_session: sessionId,
-        exercise: ex.exercise,
-        notes: ex.notes,
-      });
-
-      const sessionExerciseId = sessionExerciseRes.data.id;
-
-      for (const s of ex.sets) {
-        await axios.post("/iron/exercise-set/", {
-          session_exercise: sessionExerciseId,
-          reps: s.reps,
-          weight: s.weight,
-        });
-      }
-    }
+    const sessionRes = await axios.post(
+      "/iron/session/bulk-create/",
+      form.value,
+    );
 
     router.push({ name: "home" });
   } catch (error) {
