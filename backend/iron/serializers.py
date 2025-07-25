@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import (
     Exercise,
@@ -6,10 +7,8 @@ from .models import (
 )
 from common.serializers import DynamicFieldsSerializer
 
-"""
-I don't want to use serializer to save and update the data, 
-but only to validate the data and serialize the response.
-"""
+
+User = get_user_model()
 
 
 class ExerciseSerializer(DynamicFieldsSerializer):
@@ -60,7 +59,7 @@ class WorkoutSessionExerciseSerializer(DynamicFieldsSerializer):
     )
 
 
-class WorkoutSessionExerciseCreateSerializer(serializers.Serializer):
+class WorkoutSessionExerciseCreateSerializer(DynamicFieldsSerializer):
     workout_session = serializers.PrimaryKeyRelatedField(
         queryset=WorkoutSession.objects.all()
     )
@@ -81,3 +80,21 @@ class WorkoutSessionSerializer(DynamicFieldsSerializer):
 class WorkoutSessionCreateSerializer(DynamicFieldsSerializer):
     date = serializers.DateField(required=False)
     notes = serializers.CharField(allow_blank=True, required=False)
+
+
+class WorkoutSessionBulkExerciseSetSerializer(DynamicFieldsSerializer):
+    reps = serializers.IntegerField()
+    weight = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+class WorkoutSessionBulkExerciseSerializer(DynamicFieldsSerializer):
+    exercise = serializers.PrimaryKeyRelatedField(queryset=Exercise.objects.all())
+    notes = serializers.CharField(allow_blank=True, required=False)
+    sets = WorkoutSessionBulkExerciseSetSerializer(many=True, required=False)
+
+
+class WorkoutSessionBulkCreateSerializer(DynamicFieldsSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    date = serializers.DateField()
+    notes = serializers.CharField(allow_blank=True, required=False)
+    session_exercises = WorkoutSessionBulkExerciseSerializer(many=True)

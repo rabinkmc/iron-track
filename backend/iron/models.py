@@ -53,3 +53,6 @@ class WorkoutSessionExerciseSet(BaseModel):
 
     def __str__(self):
         return f"{self.session_exercise} - {self.reps} reps at {self.weight}kg"
+
+    class Meta:  # type: ignore
+        ordering = ["-created_at"]

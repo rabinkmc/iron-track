@@ -241,3 +241,96 @@ class WorkoutSessionExcerciseSetTest(APITestCase):
         session_exercise_set.refresh_from_db()
         self.assertEqual(session_exercise_set.reps, 12)
         self.assertEqual(session_exercise_set.weight, 110.0)
+
+    def test_workout_session_bulk_create(self):
+        url = reverse("iron:session-bulk-create")
+        ex1 = Exercise.objects.create(
+            name="Barbell Squat",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        ex2 = Exercise.objects.create(
+            name="Leg Press",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        response = self.client.post(
+            url,
+            data={
+                "user": self.user.pk,
+                "date": "2025-07-22",
+                "notes": "I did 3 exercises for legs; barbell squat, leg press, standing calf raises.",
+                "session_exercises": [
+                    {
+                        "exercise": ex1.pk,
+                        "notes": "I maxed out today, was feeling good.",
+                        "sets": [
+                            {"reps": 5, "weight": "60.00"},
+                            {"reps": 5, "weight": "80.00"},
+                        ],
+                    },
+                    {
+                        "exercise": ex2.pk,
+                        "notes": "",
+                        "sets": [
+                            {"reps": 10, "weight": "70.00"},
+                            {"reps": 12, "weight": "120.00"},
+                        ],
+                    },
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(
+            WorkoutSession.objects.filter(user=self.user, date="2025-07-22").exists()
+        )
+        self.assertTrue(WorkoutSessionExercise.objects.count() == 2)
+
+        self.assertTrue(WorkoutSessionExerciseSet.objects.count() == 4)
+
+    def test_session_list(self):
+        workout_session = WorkoutSession.objects.create(
+            user=self.user, date="2023-10-01", notes="Test session"
+        )
+        leg_press = Exercise.objects.create(
+            name="Leg Press",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        barbell_squat = Exercise.objects.create(
+            name="Barbell Squat",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        leg_press_session = WorkoutSessionExercise.objects.create(
+            workout_session=workout_session,
+            exercise=leg_press,
+            notes="Leg press notes",
+        )
+        barbell_squat_session = WorkoutSessionExercise.objects.create(
+            workout_session=workout_session,
+            exercise=barbell_squat,
+            notes="Barbell squat notes",
+        )
+        WorkoutSessionExerciseSet.objects.create(
+            session_exercise=leg_press_session, reps=10, weight=100.0
+        )
+        WorkoutSessionExerciseSet.objects.create(
+            session_exercise=leg_press_session, reps=8, weight=120.0
+        )
+        WorkoutSessionExerciseSet.objects.create(
+            session_exercise=barbell_squat_session, reps=5, weight=150.0
+        )
+        WorkoutSessionExerciseSet.objects.create(
+            session_exercise=barbell_squat_session, reps=6, weight=160.0
+        )
+        url = reverse("iron:session-list")
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        url = reverse("iron:session-detail", kwargs={"pk": workout_session.pk})
+        print(response.json())
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)

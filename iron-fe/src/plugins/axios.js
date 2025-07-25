@@ -1,13 +1,16 @@
 // src/plugins/axios.js
 import axios from "axios";
 
+// import API URL from environment variables
 const api = axios.create({
-  baseURL: "http://localhost:8000/api", // ⬅️ Replace with your backend API base
+  baseURL: import.meta.env.API_URL || "http://localhost:8000/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+// console log api base url
 
 api.interceptors.request.use(
   (config) => {

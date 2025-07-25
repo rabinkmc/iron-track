@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.decorators import action
 
 from iron.models import (
     Exercise,
@@ -15,6 +16,7 @@ from iron.models import (
 from iron.serializers import (
     ExerciseCreateSerializer,
     ExerciseSerializer,
+    WorkoutSessionBulkCreateSerializer,
     WorkoutSessionCreateSerializer,
     WorkoutSessionExerciseCreateSerializer,
     WorkoutSessionExerciseSerializer,
@@ -23,7 +25,7 @@ from iron.serializers import (
     WorkoutSessionSerializer,
 )
 
-from iron.services import update_exercise
+from iron.services import update_exercise, create_workout_session
 
 
 class ExerciseViewSet(ViewSet):
@@ -91,6 +93,14 @@ class WorkoutSessionViewSet(ViewSet):
             workout_session.date = ser.validated_data["date"]
         workout_session.save()
         return Response(ser.data)
+
+    @action(detail=False, methods=["POST"], url_path="bulk-create")
+    def bulk_create(self, request):
+        ser = WorkoutSessionBulkCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        workout_session = create_workout_session(ser.validated_data)
+        data = WorkoutSessionSerializer(workout_session).data
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class WorkoutSessionExercisesViewSet(ViewSet):
