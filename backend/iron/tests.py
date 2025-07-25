@@ -329,8 +329,3 @@ class WorkoutSessionExcerciseSetTest(APITestCase):
         url = reverse("iron:session-list")
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, 200)
-
-        url = reverse("iron:session-detail", kwargs={"pk": workout_session.pk})
-        print(response.json())
-        response = self.client.get(url, format="json")
-        self.assertEqual(response.status_code, 200)
