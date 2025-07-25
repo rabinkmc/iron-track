@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 
 from iron.models import (
     Exercise,
+    WorkoutSession,
     WorkoutSessionExercise,
     WorkoutSessionExerciseSet,
 )
@@ -69,7 +70,7 @@ class WorkoutSessionViewSet(ViewSet):
         return Response(ser.data)
 
     def retrieve(self, request, pk):
-        workout_session = get_object_or_404(request.user.workout_sessions, pk=pk)
+        workout_session = get_object_or_404(WorkoutSession, pk=pk)
         ser = WorkoutSessionSerializer(workout_session)
         return Response(ser.data)
 

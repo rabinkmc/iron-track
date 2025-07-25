@@ -27,7 +27,7 @@ class ExerciseCreateSerializer(serializers.Serializer):
 class WorkoutSessionExerciseSetSerializer(DynamicFieldsSerializer):
     id = serializers.IntegerField(read_only=True)
     session_exercise = serializers.PrimaryKeyRelatedField(
-        queryset=WorkoutSession.objects.all()
+        queryset=WorkoutSessionExercise.objects.all()
     )
     reps = serializers.IntegerField()
     weight = serializers.DecimalField(max_digits=10, decimal_places=2)
