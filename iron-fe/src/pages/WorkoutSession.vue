@@ -88,7 +88,7 @@
 
             <v-divider class="my-4" />
 
-            <v-btn color="primary" type="submit">Save Session</v-btn>
+            <v-btn color="primary" type="Submit">Save Session</v-btn>
           </v-form>
         </v-card>
       </v-col>

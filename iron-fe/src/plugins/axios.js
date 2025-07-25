@@ -1,16 +1,13 @@
 // src/plugins/axios.js
 import axios from "axios";
 
-// import API URL from environment variables
 const api = axios.create({
-  baseURL: import.meta.env.VUE_APP_API_URL || "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
-
-// console log api base url
 
 api.interceptors.request.use(
   (config) => {
