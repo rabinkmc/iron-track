@@ -68,6 +68,7 @@ const handleLogin = async () => {
   });
   localStorage.setItem("access_token", response.data.access);
   localStorage.setItem("refresh_token", response.data.refresh);
+  localStorage.setItem("user_id", response.data.user.id);
   router.push({ name: "home" });
 };
 </script>
