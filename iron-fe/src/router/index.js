@@ -32,11 +32,11 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.VUE_APP_BASE_URL),
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   const isAuthenticated = !!localStorage.getItem("access_token");
 
   if (to.name !== "login" && !isAuthenticated) {
