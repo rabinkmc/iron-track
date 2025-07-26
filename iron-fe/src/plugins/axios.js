@@ -22,6 +22,42 @@ api.interceptors.request.use(
   },
 );
 
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // Optionally, you can implement a refresh token logic here
+      // For example, check if a refresh token is available and use it to get a new access token
+
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (refreshToken) {
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/token/refresh`,
+            { refresh_token: refreshToken },
+          );
+          const { access_token } = response.data;
+          localStorage.setItem("access_token", access_token);
+          api.defaults.headers.common["Authorization"] =
+            `Bearer ${access_token}`;
+          originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          console.error("Refresh token failed:", refreshError);
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export default {
   install: (app) => {
     app.provide("axios", api); // optional if you want to use inject() too
