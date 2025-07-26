@@ -49,7 +49,11 @@ api.interceptors.response.use(
           originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
           return api(originalRequest);
         } catch (refreshError) {
-          console.error("Refresh token failed:", refreshError);
+          // redirect to login if refresh fails
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("user_id");
+          window.location.href = "/login"; // or use router to navigate
         }
       }
     }
