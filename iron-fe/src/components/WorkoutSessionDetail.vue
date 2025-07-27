@@ -1,6 +1,14 @@
 <template>
   <v-container>
+    <v-app-bar app>
+      <v-toolbar-title>Workout Session</v-toolbar-title>
+      <v-spacer />
+      <v-btn icon @click="onEdit">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+    </v-app-bar>
     <v-data-table
+      v-if="!enableEdit"
       :items="tableItems"
       class="elevation-1"
       disable-pagination
@@ -18,16 +26,23 @@
         </tr>
       </template>
     </v-data-table>
+    <WorkoutSessionEdit
+      v-else
+      :form="sessionData"
+      @submit="onSubmit"
+    ></WorkoutSessionEdit>
   </v-container>
 </template>
 
 <script setup>
 import { ref, inject, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import WorkoutSessionEdit from "./WorkoutSessionEdit.vue";
 
 const axios = inject("axios");
 const route = useRoute();
 const apiUrl = `/iron/session/${route.params.id}`;
+const enableEdit = ref(false);
 
 const sessionData = ref(null);
 const maxSets = 5;
@@ -53,6 +68,16 @@ function processData(data) {
       weight: set.weight,
     })),
   }));
+}
+
+function onEdit() {
+  enableEdit.value = !enableEdit.value;
+}
+
+function onSubmit(session) {
+  sessionData.value = session;
+  enableEdit.value = false;
+  tableItems.value = processData(sessionData.value);
 }
 
 // On mounted, fetch data from API

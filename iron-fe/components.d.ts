@@ -12,5 +12,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     WorkoutSessionDetail: typeof import('./src/components/WorkoutSessionDetail.vue')['default']
+    WorkoutSessionEdit: typeof import('./src/components/WorkoutSessionEdit.vue')['default']
   }
 }
