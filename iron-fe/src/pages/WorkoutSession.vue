@@ -14,11 +14,8 @@
             />
 
             <v-textarea v-model="form.notes" label="Session Notes" rows="2" />
-
             <v-divider class="my-4" />
-
             <v-card-subtitle>Exercises</v-card-subtitle>
-
             <div
               v-for="(exerciseEntry, index) in form.session_exercises"
               :key="index"

@@ -6,6 +6,9 @@
       <v-btn icon @click="onEdit">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
+      <v-btn icon @click="deleteSession">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-data-table
       v-if="!enableEdit"
@@ -41,7 +44,7 @@ import WorkoutSessionEdit from "./WorkoutSessionEdit.vue";
 
 const axios = inject("axios");
 const route = useRoute();
-const apiUrl = `/iron/session/${route.params.id}`;
+const apiUrl = `/iron/session/${route.params.id}/`;
 const enableEdit = ref(false);
 
 const sessionData = ref(null);
@@ -90,6 +93,18 @@ onMounted(async () => {
     console.error("Error fetching workout session:", error);
   }
 });
+async function deleteSession() {
+  if (confirm("Are you sure you want to delete this session?")) {
+    try {
+      await axios.delete(apiUrl);
+      alert("Session deleted successfully.");
+      router.push({ name: "home" }); // Replace "home" with your desired route
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      alert("Failed to delete session.");
+    }
+  }
+}
 </script>
 
 <style scoped>

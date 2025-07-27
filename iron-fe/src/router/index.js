@@ -4,6 +4,7 @@ import HomePage from "../pages/HomePage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import WorkoutSession from "../pages/WorkoutSession.vue";
 import WorkoutSessionDetail from "../components/WorkoutSessionDetail.vue";
+import ExercisePage from "../pages/ExercisePage.vue";
 
 const routes = [
   {
@@ -22,6 +23,11 @@ const routes = [
     path: "/workout-session/:id",
     name: "workout-session-detail",
     component: WorkoutSessionDetail,
+  },
+  {
+    path: "/exercise",
+    name: "exercise",
+    component: ExercisePage,
   },
   {
     path: "/login",
