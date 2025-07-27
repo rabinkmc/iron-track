@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, defineProps } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { useRouter } from "vue-router";
 
 const axios = inject("axios");
