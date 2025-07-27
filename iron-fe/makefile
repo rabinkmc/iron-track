@@ -17,4 +17,4 @@ build:
 # Clean frontend build (if using dist/)
 clean:
 	rm -rf dist
-	[[-f dist.zip]] && rm dist.zip
+	[[ -f dist.zip ]] && rm dist.zip
