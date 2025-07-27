@@ -10,7 +10,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 @api_view(["GET"])
-def api_versioning(request):
+def version(request):
     """
     Returns the API version as a JSON response.
     """
