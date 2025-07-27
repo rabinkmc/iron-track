@@ -79,7 +79,7 @@ class WorkoutSessionViewSet(ViewSet):
         return Response(ser.data)
 
     def create(self, request):
-        ser = WorkoutSessionCreateSerializer(data=request.data)
+        ser = WorkoutSessionCreateEditSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         workout_date = ser.validated_data.get("date") or date.today()
         user = request.user
@@ -91,13 +91,18 @@ class WorkoutSessionViewSet(ViewSet):
 
     def update(self, request, pk):
         workout_session = get_object_or_404(request.user.workout_sessions, pk=pk)
-        ser = WorkoutSessionCreateSerializer(workout_session, data=request.data)
+        ser = WorkoutSessionCreateEditSerializer(workout_session, data=request.data)
         ser.is_valid(raise_exception=True)
         workout_session.notes = ser.validated_data.get("notes", "")
         if ser.data.get("date"):
             workout_session.date = ser.validated_data["date"]
         workout_session.save()
         return Response(ser.data)
+
+    def destroy(self, request, pk):
+        workout_session = get_object_or_404(request.user.workout_sessions, pk=pk)
+        workout_session.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["POST"], url_path="bulk-create")
     def bulk_create(self, request):

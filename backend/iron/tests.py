@@ -12,7 +12,7 @@ from iron.models import (
 User = get_user_model()
 
 
-class SessionCreateTest(APITestCase):
+class SessionTest(APITestCase):
     def setUp(self):
         """
         create a user and force login
@@ -60,8 +60,17 @@ class SessionCreateTest(APITestCase):
             ).exists()
         )
 
+    def test_workout_session_delete(self):
+        workout = WorkoutSession.objects.create(
+            user=self.user, date="2023-10-01", notes="Initial notes"
+        )
+        url = reverse("iron:session-detail", kwargs={"pk": workout.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(WorkoutSession.objects.filter(pk=workout.pk).exists())
 
-class ExerciseCreateTest(APITestCase):
+
+class ExerciseTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="admin", password="admin")  # type: ignore
         self.client.force_login(self.user)
@@ -110,6 +119,18 @@ class ExerciseCreateTest(APITestCase):
         exercise.refresh_from_db()
         self.assertEqual(exercise.name, "Bench Press Updated")
         self.assertEqual(exercise.description, "Updated description.")
+
+    def test_exercise_delete(self):
+        exercise = Exercise.objects.create(
+            name="Bench Press",
+            muscle_targeted="Chest",
+            description="A compound exercise for the chest.",
+        )
+        url = reverse("iron:exercise-detail", kwargs={"pk": exercise.pk})
+        print(url)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Exercise.objects.filter(pk=exercise.pk).exists())
 
 
 class WorkoutSessionExerciseTest(APITestCase):
