@@ -7,6 +7,7 @@ REMOTE_PATH=/home/ubuntu/iron-track/
 
 deploy: build
 	scp dist.zip $(REMOTE_ALIAS):$(REMOTE_PATH)
+	ssh $(REMOTE_ALIAS) "cd $(REMOTE_PATH) && unzip -o dist.zip && rm dist.zip"
 
 build:
 	npm run build
@@ -17,4 +18,4 @@ build:
 # Clean frontend build (if using dist/)
 clean:
 	rm -rf dist
-	[[ -f dist.zip ]] && rm dist.zip
+	rm -rf dist.zip
