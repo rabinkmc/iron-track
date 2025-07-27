@@ -43,24 +43,19 @@ def update_workout_session(workout_session, data):
     workout_session.date = data.get("date", workout_session.date)
     workout_session.notes = data.get("notes", workout_session.notes)
     workout_session.save()
+    workout_session.session_exercises.all().delete()
 
     for session_exercise_data in data.get("session_exercises", []):
-        session_exercise, _ = WorkoutSessionExercise.objects.update_or_create(
-            id=session_exercise_data.get("id"),
-            defaults={
-                "workout_session": workout_session,
-                "exercise": session_exercise_data["exercise"],
-                "notes": session_exercise_data.get("notes", ""),
-            },
+        session_exercise = WorkoutSessionExercise.objects.create(
+            workout_session=workout_session,
+            exercise=session_exercise_data["exercise"],
+            notes=session_exercise_data.get("notes", ""),
         )
 
         for set_data in session_exercise_data.get("sets", []):
-            WorkoutSessionExerciseSet.objects.update_or_create(
-                id=set_data.get("id"),
-                defaults={
-                    "session_exercise": session_exercise,
-                    "reps": set_data["reps"],
-                    "weight": set_data["weight"],
-                },
+            WorkoutSessionExerciseSet.objects.create(
+                session_exercise=session_exercise,
+                reps=set_data["reps"],
+                weight=set_data["weight"],
             )
-    return workout_session
+    workout_session.save()
