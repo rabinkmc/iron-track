@@ -77,7 +77,7 @@ class WorkoutSessionSerializer(DynamicFieldsSerializer):
     )
 
 
-class WorkoutSessionCreateSerializer(DynamicFieldsSerializer):
+class WorkoutSessionCreateEditSerializer(DynamicFieldsSerializer):
     date = serializers.DateField(required=False)
     notes = serializers.CharField(allow_blank=True, required=False)
 
@@ -93,7 +93,7 @@ class WorkoutSessionBulkExerciseSerializer(DynamicFieldsSerializer):
     sets = WorkoutSessionBulkExerciseSetSerializer(many=True, required=False)
 
 
-class WorkoutSessionBulkCreateSerializer(DynamicFieldsSerializer):
+class WorkoutSessionBulkCreateEditSerializer(DynamicFieldsSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     date = serializers.DateField()
     notes = serializers.CharField(allow_blank=True, required=False)

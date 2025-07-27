@@ -290,6 +290,86 @@ class WorkoutSessionExcerciseSetTest(APITestCase):
 
         self.assertTrue(WorkoutSessionExerciseSet.objects.count() == 4)
 
+    def test_workout_session_bulk_edit(self):
+        ex1 = Exercise.objects.create(
+            name="Barbell Squat",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        ex2 = Exercise.objects.create(
+            name="Leg Press",
+            muscle_targeted="Legs",
+            description="A compound exercise for the legs.",
+        )
+        # create a workout session from above bulk create data
+        workout_session = WorkoutSession.objects.create(
+            user=self.user, date="2025-07-22", notes="Initial notes"
+        )
+        wex1 = WorkoutSessionExercise.objects.create(
+            workout_session=workout_session,
+            exercise=ex1,
+            notes="I maxed out today, was feeling good.",
+        )
+        wex2 = WorkoutSessionExercise.objects.create(
+            workout_session=workout_session,
+            exercise=ex2,
+            notes="",
+        )
+        s1 = WorkoutSessionExerciseSet.objects.create(
+            session_exercise=WorkoutSessionExercise.objects.get(exercise=ex1),
+            reps=5,
+            weight=60.00,
+        )
+        s2 = WorkoutSessionExerciseSet.objects.create(
+            session_exercise=WorkoutSessionExercise.objects.get(exercise=ex1),
+            reps=5,
+            weight=80.00,
+        )
+        s3 = WorkoutSessionExerciseSet.objects.create(
+            session_exercise=WorkoutSessionExercise.objects.get(exercise=ex2),
+            reps=10,
+            weight=70.00,
+        )
+        s4 = WorkoutSessionExerciseSet.objects.create(
+            session_exercise=WorkoutSessionExercise.objects.get(exercise=ex2),
+            reps=12,
+            weight=120.00,
+        )
+        # now test the bulk edit
+        url = reverse("iron:session-bulk-edit", kwargs={"pk": workout_session.pk})
+
+        response = self.client.post(
+            url,
+            data={
+                "user": self.user.pk,
+                "id": workout_session.pk,
+                "date": "2025-07-22",
+                "notes": "I did 3 exercises for legs; barbell squat, leg press, standing calf raises.",
+                "session_exercises": [
+                    {
+                        "id": wex1.pk,
+                        "exercise": ex1.pk,
+                        "notes": "I maxed out today, was feeling good.",
+                        "sets": [
+                            {"id": s1.pk, "reps": 5, "weight": "60.00"},
+                            {"id": s2.pk, "reps": 5, "weight": "80.00"},
+                        ],
+                    },
+                    {
+                        "id": wex2.pk,
+                        "exercise": ex2.pk,
+                        "notes": "",
+                        "sets": [
+                            {"id": s3.pk, "reps": 10, "weight": "70.00"},
+                            {"id": s4.pk, "reps": 12, "weight": "120.00"},
+                        ],
+                    },
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.json())
+
     def test_session_list(self):
         workout_session = WorkoutSession.objects.create(
             user=self.user, date="2023-10-01", notes="Test session"

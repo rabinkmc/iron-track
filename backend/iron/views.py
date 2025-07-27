@@ -17,8 +17,8 @@ from iron.models import (
 from iron.serializers import (
     ExerciseCreateSerializer,
     ExerciseSerializer,
-    WorkoutSessionBulkCreateSerializer,
-    WorkoutSessionCreateSerializer,
+    WorkoutSessionBulkCreateEditSerializer,
+    WorkoutSessionCreateEditSerializer,
     WorkoutSessionExerciseCreateSerializer,
     WorkoutSessionExerciseSerializer,
     WorkoutSessionExerciseSetCreateSerializer,
@@ -26,7 +26,11 @@ from iron.serializers import (
     WorkoutSessionSerializer,
 )
 
-from iron.services import update_exercise, create_workout_session
+from iron.services import (
+    update_exercise,
+    create_workout_session,
+    update_workout_session,
+)
 
 
 class ExerciseViewSet(ViewSet):
@@ -97,11 +101,20 @@ class WorkoutSessionViewSet(ViewSet):
 
     @action(detail=False, methods=["POST"], url_path="bulk-create")
     def bulk_create(self, request):
-        ser = WorkoutSessionBulkCreateSerializer(data=request.data)
+        ser = WorkoutSessionBulkCreateEditSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         workout_session = create_workout_session(ser.validated_data)
         data = WorkoutSessionSerializer(workout_session).data
         return Response(data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["POST"], url_path="bulk-edit")
+    def bulk_edit(self, request, pk):
+        workout_session = get_object_or_404(request.user.workout_sessions, pk=pk)
+        ser = WorkoutSessionBulkCreateEditSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        workout_session = update_workout_session(workout_session, ser.validated_data)
+        data = WorkoutSessionSerializer(workout_session).data
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class WorkoutSessionExercisesViewSet(ViewSet):

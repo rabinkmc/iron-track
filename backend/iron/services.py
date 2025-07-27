@@ -36,3 +36,31 @@ def create_workout_session(data):
             )
     workout_session.save()
     return workout_session
+
+
+# create update session except it receives, workout_session_id and data
+def update_workout_session(workout_session, data):
+    workout_session.date = data.get("date", workout_session.date)
+    workout_session.notes = data.get("notes", workout_session.notes)
+    workout_session.save()
+
+    for session_exercise_data in data.get("session_exercises", []):
+        session_exercise, _ = WorkoutSessionExercise.objects.update_or_create(
+            id=session_exercise_data.get("id"),
+            defaults={
+                "workout_session": workout_session,
+                "exercise": session_exercise_data["exercise"],
+                "notes": session_exercise_data.get("notes", ""),
+            },
+        )
+
+        for set_data in session_exercise_data.get("sets", []):
+            WorkoutSessionExerciseSet.objects.update_or_create(
+                id=set_data.get("id"),
+                defaults={
+                    "session_exercise": session_exercise,
+                    "reps": set_data["reps"],
+                    "weight": set_data["weight"],
+                },
+            )
+    return workout_session
