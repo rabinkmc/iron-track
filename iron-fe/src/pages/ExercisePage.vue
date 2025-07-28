@@ -24,7 +24,7 @@
         <v-btn small icon @click="openEditDialog(item)">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <v-btn icon color="error" @click="openDeleteDialog(item)">
+        <v-btn icon @click="openDeleteDialog(item)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </template>
