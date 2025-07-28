@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.utils.decorators import method_decorator
+
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
@@ -40,7 +39,6 @@ def version(request):
 User = get_user_model()
 
 
-@method_decorator(csrf_exempt, name="dispatch")
 @api_view(["POST"])
 def google_login(request):
     token = request.data.get("id_token")
