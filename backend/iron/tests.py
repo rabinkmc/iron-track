@@ -127,7 +127,6 @@ class ExerciseTest(APITestCase):
             description="A compound exercise for the chest.",
         )
         url = reverse("iron:exercise-detail", kwargs={"pk": exercise.pk})
-        print(url)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Exercise.objects.filter(pk=exercise.pk).exists())
