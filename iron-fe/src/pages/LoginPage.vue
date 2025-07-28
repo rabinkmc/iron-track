@@ -36,13 +36,21 @@
               prepend-inner-icon="mdi-lock"
               required
             ></v-text-field>
-
             <v-btn type="submit" color="primary" block class="mt-4">
               Login
             </v-btn>
-
             <div class="mt-4 text-center">
               <small>Don’t have an account? <a href="#">Sign up</a></small>
+            </div>
+            <div class="mt-4 text-center">
+              <v-divider class="my-6">
+                <v-chip label color="grey-lighten-3" class="text-caption">
+                  Or login with
+                </v-chip>
+              </v-divider>
+              <div class="ma-2 pa-2 text-center">
+                <div id="google-signin-button"></div>
+              </div>
             </div>
           </v-form>
         </v-card>
@@ -52,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { inject } from "vue";
 import { useRouter } from "vue-router";
 
@@ -71,6 +79,45 @@ const handleLogin = async () => {
   localStorage.setItem("user_id", response.data.user.id);
   router.push({ name: "home" });
 };
+
+onMounted(() => {
+  window.google.accounts.id.initialize({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+  });
+
+  /* Render the sign-in button */
+  window.google.accounts.id.renderButton(
+    document.getElementById("google-signin-button"),
+    {
+      theme: "outline",
+      size: "large",
+      shape: "rectangular",
+    },
+  );
+});
+
+async function handleCredentialResponse(response) {
+  const idToken = response.credential;
+  try {
+    const res = await axios.post("/google-login/", {
+      id_token: idToken,
+    });
+
+    const { access, refresh, user } = res.data;
+
+    // Store tokens in localStorage
+    localStorage.setItem("access_token", access);
+    localStorage.setItem("refresh_token", refresh);
+
+    router.push({ name: "home" });
+  } catch (error) {
+    console.error(
+      "Google login failed:",
+      error.response?.data || error.message,
+    );
+  }
+}
 </script>
 
 <style scoped>
