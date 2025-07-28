@@ -41,29 +41,27 @@ User = get_user_model()
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class GoogleLoginView(APIView):
-    def post(self, request):
-        token = request.data.get("id_token")
-        if not token:
-            return Response({"detail": "No token provided"}, status=400)
+@api_view(["POST"])
+def google_login(request):
+    token = request.data.get("id_token")
+    if not token:
+        return Response({"detail": "No token provided"}, status=400)
 
-        try:
-            idinfo = id_token.verify_oauth2_token(
-                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
-            )
-            email = idinfo["email"]
-            user, _ = User.objects.get_or_create(
-                email=email, defaults={"username": email}
-            )
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+        )
+        email = idinfo["email"]
+        user, _ = User.objects.get_or_create(email=email, defaults={"username": email})
 
-            # Issue JWT token
-            refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                    "user": {"email": user.email, "id": user.id},
-                }
-            )
-        except ValueError:
-            return Response({"detail": "Invalid token"}, status=400)
+        # Issue JWT token
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+                "user": {"email": user.email, "id": user.id},
+            }
+        )
+    except ValueError:
+        return Response({"detail": "Invalid token"}, status=400)
