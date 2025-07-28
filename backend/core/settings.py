@@ -184,3 +184,5 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+# google auth
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
