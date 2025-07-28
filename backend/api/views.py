@@ -3,7 +3,11 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
@@ -40,6 +44,8 @@ User = get_user_model()
 
 
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def google_login(request):
     token = request.data.get("id_token")
     if not token:
