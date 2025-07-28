@@ -39,13 +39,14 @@
 
 <script setup>
 import { ref, inject, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import WorkoutSessionEdit from "./WorkoutSessionEdit.vue";
 
 const axios = inject("axios");
 const route = useRoute();
 const apiUrl = `/iron/session/${route.params.id}/`;
 const enableEdit = ref(false);
+const router = useRouter();
 
 const sessionData = ref(null);
 const maxSets = 5;
@@ -97,7 +98,6 @@ async function deleteSession() {
   if (confirm("Are you sure you want to delete this session?")) {
     try {
       await axios.delete(apiUrl);
-      alert("Session deleted successfully.");
       router.push({ name: "home" }); // Replace "home" with your desired route
     } catch (error) {
       console.error("Failed to delete session:", error);

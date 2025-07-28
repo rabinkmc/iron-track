@@ -86,7 +86,6 @@ onMounted(() => {
     callback: handleCredentialResponse,
   });
 
-  /* Render the sign-in button */
   window.google.accounts.id.renderButton(
     document.getElementById("google-signin-button"),
     {
@@ -109,6 +108,7 @@ async function handleCredentialResponse(response) {
     // Store tokens in localStorage
     localStorage.setItem("access_token", access);
     localStorage.setItem("refresh_token", refresh);
+    localStorage.setItem("user_id", user.id);
 
     router.push({ name: "home" });
   } catch (error) {
