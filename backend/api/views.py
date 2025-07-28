@@ -62,7 +62,7 @@ def google_login(request):
             {
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
-                "user": {"email": user.email, "id": user.id},
+                "user": {"email": user.email, "id": user.id},  # type: ignore
             }
         )
     except ValueError:

@@ -34,6 +34,8 @@ from iron.services import (
 
 
 class ExerciseViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+
     def list(self, _):
         ser = ExerciseSerializer(Exercise.objects.all(), many=True)
         return Response(ser.data)
@@ -149,22 +151,21 @@ class WorkoutSessionExercisesViewSet(ViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def list(self, request):
-        excercise = WorkoutSessionExercise.objects.all()
-        ser = WorkoutSessionExerciseSerializer(excercise, many=True)
+        excercises = WorkoutSessionExercise.objects.filter(
+            workout_session__in=request.user.workout_sessions.all()
+        ).all()
+        ser = WorkoutSessionExerciseSerializer(excercises, many=True)
         return Response(ser.data)
 
 
 class WorkoutSessionExerciseSetViewSet(ViewSet):
-    """
-    we will receive session exercise id
-
-    1. ability to add sets to a session exercise
-    2. ability to list sets of a session exercise
-    """
-
     def create(self, request):
+        # Ensure the session_exercise exists for the user
         session_exercise = get_object_or_404(
-            WorkoutSessionExercise, pk=request.data.get("session_exercise")
+            WorkoutSessionExercise.objects.filter(
+                workout_session__user=request.user,
+            ),
+            pk=request.data.get("session_exercise"),
         )
         ser = WorkoutSessionExerciseSetCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -176,7 +177,13 @@ class WorkoutSessionExerciseSetViewSet(ViewSet):
         return Response(status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
-        session_exercise_set = get_object_or_404(WorkoutSessionExerciseSet, pk=pk)
+        # Ensure the session_exercise_set exists for the user
+        session_exercise_set = get_object_or_404(
+            WorkoutSessionExerciseSet.objects.filter(
+                session_exercise__workout_session__user=request.user
+            ),
+            pk=pk,
+        )
         ser = WorkoutSessionExerciseSetCreateSerializer(
             session_exercise_set, data=request.data
         )
@@ -187,9 +194,6 @@ class WorkoutSessionExerciseSetViewSet(ViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def list(self, request):
-        """
-        list all exercise sets for the authenticated user
-        """
         sets = WorkoutSessionExerciseSet.objects.filter(
             session_exercise__workout_session__user=request.user
         ).select_related("session_exercise__exercise")
