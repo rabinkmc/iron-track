@@ -78,22 +78,6 @@ const handleLogin = async () => {
   router.push({ name: "home" });
 };
 
-//onMounted(() => {
-//  window.google.accounts.id.initialize({
-//    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-//    callback: handleCredentialResponse,
-//  });
-//
-//  window.google.accounts.id.renderButton(
-//    document.getElementById("google-signin-button"),
-//    {
-//      theme: "outline",
-//      size: "large",
-//      shape: "rectangular",
-//    },
-//  );
-//});
-
 const signInWithGoogle = () => {
   window.google.accounts.id.initialize({
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
