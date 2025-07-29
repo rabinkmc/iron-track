@@ -33,6 +33,10 @@ jobs:
           sed -i /preload/d dist/index.html
           zip -r dist.zip dist/
 
+      - name: Add remote host to known_hosts
+        run: |
+          ssh-keyscan -H 54.172.95.171 >> ~/.ssh/known_hosts
+
       - name: Deploy 
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
