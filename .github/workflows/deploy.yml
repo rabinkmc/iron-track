@@ -1,0 +1,46 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and zip
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        run: |
+          npm run build
+          sed -i /preload/d dist/index.html
+          zip -r dist.zip dist/
+
+      - name: Deploy 
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          git remote add deploy ssh://ubuntu@54.172.95.171/home/ubuntu/repo.git
+          git push deploy main 
+          scp -i private_key dist.zip ubuntu@54.172.95.171/home/ubuntu/iron-track/
+          ssh -i private_key ubuntu@54.172.95.171 << EOF
+            cd /home/ubuntu/iron-track/
+            unzip -o dist.zip
+            rm dist.zip
+          EOF
