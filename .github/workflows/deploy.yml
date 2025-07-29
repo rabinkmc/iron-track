@@ -19,13 +19,16 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd iron-fe
+          npm install
 
       - name: Build and zip
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: |
+          cd iron-fe
           npm run build
           sed -i /preload/d dist/index.html
           zip -r dist.zip dist/
