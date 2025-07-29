@@ -33,6 +33,9 @@ jobs:
           sed -i /preload/d dist/index.html
           zip -r dist.zip dist/
 
+      - name: Create SSH directory
+        run: mkdir -p ~/.ssh
+
       - name: Add remote host to known_hosts
         run: |
           ssh-keyscan -H 54.172.95.171 >> ~/.ssh/known_hosts
