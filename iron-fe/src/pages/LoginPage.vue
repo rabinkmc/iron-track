@@ -11,11 +11,7 @@
       </v-col>
 
       <!-- Right side with login form -->
-      <v-col
-        cols="12"
-        md="6"
-        class="d-flex align-center justify-center pa-8 bg-white"
-      >
+      <v-col cols="12" md="6" class="d-flex align-center justify-center pa-8">
         <v-card width="100%" max-width="400" class="pa-6 elevation-10">
           <v-card-title class="text-h5 text-center mb-4">
             Welcome to Iron Track
@@ -42,15 +38,17 @@
             <div class="mt-4 text-center">
               <small>Don’t have an account? <a href="#">Sign up</a></small>
             </div>
-            <div class="mt-4 text-center">
-              <v-divider class="my-6">
-                <v-chip label color="grey-lighten-3" class="text-caption">
-                  Or login with
-                </v-chip>
-              </v-divider>
-              <div class="ma-2 pa-2 text-center">
-                <div id="google-signin-button"></div>
-              </div>
+            <v-divider class="my-4" :thickness="4"></v-divider>
+            <div class="mt-4">
+              <v-btn
+                color="red darken-1"
+                width="100%"
+                dark
+                @click="signInWithGoogle"
+              >
+                <v-icon left>mdi-google</v-icon>
+                Continue with Google
+              </v-btn>
             </div>
           </v-form>
         </v-card>
@@ -80,21 +78,30 @@ const handleLogin = async () => {
   router.push({ name: "home" });
 };
 
-onMounted(() => {
+//onMounted(() => {
+//  window.google.accounts.id.initialize({
+//    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+//    callback: handleCredentialResponse,
+//  });
+//
+//  window.google.accounts.id.renderButton(
+//    document.getElementById("google-signin-button"),
+//    {
+//      theme: "outline",
+//      size: "large",
+//      shape: "rectangular",
+//    },
+//  );
+//});
+
+const signInWithGoogle = () => {
   window.google.accounts.id.initialize({
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
     callback: handleCredentialResponse,
   });
 
-  window.google.accounts.id.renderButton(
-    document.getElementById("google-signin-button"),
-    {
-      theme: "outline",
-      size: "large",
-      shape: "rectangular",
-    },
-  );
-});
+  window.google.accounts.id.prompt(); // This opens the Google One Tap or popup
+};
 
 async function handleCredentialResponse(response) {
   const idToken = response.credential;
