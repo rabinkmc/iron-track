@@ -99,7 +99,7 @@ const selected = ref(null);
 
 const fetchExercises = async () => {
   const res = await axios.get("/iron/exercise/");
-  exercises.value = res.data;
+  exercises.value = res.data.results;
 };
 
 const openCreateDialog = () => {
