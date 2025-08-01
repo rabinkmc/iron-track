@@ -7,6 +7,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 
 from iron.models import (
     Exercise,
@@ -36,9 +37,13 @@ from iron.services import (
 class ExerciseViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    def list(self, _):
-        ser = ExerciseSerializer(Exercise.objects.all(), many=True)
-        return Response(ser.data)
+    def list(self, request):
+        queryset = Exercise.objects.all()
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = ExerciseSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk):
         exercise = get_object_or_404(Exercise, pk=pk)
