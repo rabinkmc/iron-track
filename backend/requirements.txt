@@ -3,6 +3,7 @@ asgiref==3.9.1
 asttokens==3.0.0
 billiard==4.2.1
 black==25.1.0
+cachetools==5.5.2
 celery==5.5.3
 certifi==2025.7.9
 charset-normalizer==3.4.2
@@ -21,6 +22,7 @@ djangorestframework==3.16.0
 djangorestframework-stubs==3.16.0
 djangorestframework_simplejwt==5.5.0
 executing==2.2.0
+google-auth==2.40.3
 idna==3.10
 ipdb==0.13.13
 ipython==9.4.0
@@ -38,11 +40,14 @@ prompt_toolkit==3.0.51
 psycopg2==2.9.10
 ptyprocess==0.7.0
 pure_eval==0.2.3
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
 Pygments==2.19.2
 PyJWT==2.9.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 requests==2.32.4
+rsa==4.9.1
 six==1.17.0
 sqlparse==0.5.3
 stack-data==0.6.3
