@@ -7,7 +7,16 @@
     </v-toolbar>
 
     <!-- Exercise Table -->
-    <v-data-table :items="exercises" :headers="headers" class="mt-4">
+    <v-data-table-server
+      :headers="headers"
+      :items="exercises"
+      :options.sync="options"
+      :server-items-length="count"
+      :loading="loading"
+      :items-length="exercises.length"
+      @update:options="onUpdateOptions"
+      class="mt-4"
+    >
       <template #item.description="{ item }">
         <div
           style="
@@ -28,7 +37,7 @@
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </template>
-    </v-data-table>
+    </v-data-table-server>
 
     <!-- Create/Edit Dialog -->
     <v-dialog v-model="dialog" max-width="500">
@@ -72,11 +81,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from "vue";
+import { ref, onMounted, watch, inject } from "vue";
 
 const axios = inject("axios");
 
 const exercises = ref([]);
+const count = ref(0);
+const loading = ref(false);
+
 const headers = [
   { title: "id", key: "id" },
   { title: "Name", key: "name" },
@@ -96,10 +108,24 @@ const form = ref({
 });
 
 const selected = ref(null);
+const options = ref({
+  page: 1,
+  itemsPerPage: 10,
+  sortBy: [],
+  sortDesc: [],
+});
 
 const fetchExercises = async () => {
-  const res = await axios.get("/iron/exercise/");
+  const { page } = options.value;
+  loading.value = true;
+  const res = await axios.get("/iron/exercise/", {
+    params: {
+      page,
+    },
+  });
   exercises.value = res.data.results;
+  count.value = res.data.count;
+  loading.value = false;
 };
 
 const openCreateDialog = () => {
@@ -144,5 +170,11 @@ const deleteExercise = async () => {
   }
 };
 
-onMounted(fetchExercises);
+watch(options, fetchExercises, { deep: true });
+const onUpdateOptions = (newOptions) => {
+  options.value = newOptions;
+};
+onMounted(async () => {
+  await fetchExercises();
+});
 </script>
