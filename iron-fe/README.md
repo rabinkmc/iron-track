@@ -24,3 +24,4 @@ make deploy
 - [ ] Register users
 - [ ] Charts and graphs to track gym progress
 - [ ] Table view for workouts 
+- [ ] validations 
