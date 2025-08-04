@@ -113,7 +113,7 @@ const exerciseOptions = ref([]);
 const fetchExercises = async () => {
   try {
     const response = await axios.get("/iron/exercise/");
-    exerciseOptions.value = response.data;
+    exerciseOptions.value = response.data.results;
   } catch (error) {
     console.error("Failed to fetch exercises", error);
   }
