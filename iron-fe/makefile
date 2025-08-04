@@ -11,7 +11,7 @@ deploy: build
 
 build:
 	# VITE_API_URL="https://iron.rabindhamala.com.np/api"
-sed -i 's|VITE_API_URL=.*|VITE_API_URL="https://iron.rabindhamala.com.np/api"|' .env
+	sed -i 's|VITE_API_URL=.*|VITE_API_URL="https://iron.rabindhamala.com.np/api"|' .env
 	npm run build
 	sed -i /preload/d dist/index.html
 	zip -r dist.zip dist/

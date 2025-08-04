@@ -1,0 +1,17 @@
+#!/bin/bash
+
+WORK_TREE=/home/ubuntu/iron-track
+GIT_DIR=/home/ubuntu/repo.git
+
+echo "Deploying to $WORK_TREE ..."
+
+# Checkout the pushed code to working directory
+git --work-tree=$WORK_TREE --git-dir=$GIT_DIR checkout -f
+
+cd $WORK_TREE
+pip install -r requirements.txt
+/home/ubuntu/iron-track/.venv/bin/python manage.py migrate
+/home/ubuntu/iron-track/.venv/bin/python manage.py collectstatic --noinput
+sudo systemctl restart irontrack.service
+
+echo "Deployment completed"
