@@ -29,10 +29,10 @@ def version(request):
     from rest_framework.response import Response
 
     version_info = {
-        "version": "0.0.1",
+        "version": "0.0.2",
         "status": "dev",
-        "release_date": "2023-10-02",
-        "description": "google auth",
+        "release_date": "2023-10-06",
+        "description": "dockerized django rest framework api",
     }
     return Response(version_info, status=status.HTTP_200_OK)
 
