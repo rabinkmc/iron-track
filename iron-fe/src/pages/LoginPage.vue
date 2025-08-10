@@ -36,7 +36,10 @@
               Login
             </v-btn>
             <div class="mt-4 text-center">
-              <small>Don’t have an account? <a href="#">Sign up</a></small>
+              <small>
+                Don’t have an account?
+                <router-link :to="{ name: 'signup' }">Sign up</router-link>
+              </small>
             </div>
             <v-divider class="my-4" :thickness="4"></v-divider>
             <div class="mt-4">
@@ -67,6 +70,7 @@ const username = ref("");
 const password = ref("");
 const loginForm = ref(null);
 const router = useRouter();
+const signUp = ref(false);
 const handleLogin = async () => {
   const response = await axios.post("/token/", {
     username: username.value,

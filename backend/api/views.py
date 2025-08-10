@@ -11,9 +11,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-
 from api.serializers import CustomTokenObtainPairSerializer
 from django.conf import settings
+from users.serializers import UserSignupSerializer
+from users.services import create_user
 
 User = get_user_model()
 
@@ -58,3 +59,14 @@ def google_login(request):
         )
     except ValueError:
         return Response({"detail": "Invalid token"}, status=400)
+
+
+@api_view(["POST"])
+def signup(request):
+    serializer = UserSignupSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    # Use the service to create the user with validated data
+    create_user(serializer.validated_data)
+
+    return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)

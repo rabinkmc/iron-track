@@ -11,5 +11,7 @@
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 const route = useRoute();
-const showLayout = computed(() => route.name !== "login");
+const showLayout = computed(
+  () => route.name !== "login" && route.name !== "signup",
+);
 </script>
