@@ -5,10 +5,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        # Add custom user data to response
-        data["user"] = {
-            "id": self.user.id,
-            "username": self.user.username,
+        data["user"] = {  # type: ignore
+            "id": self.user.id,  # type: ignore
+            "username": self.user.username,  # type: ignore
         }
 
         return data

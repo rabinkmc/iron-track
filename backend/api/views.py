@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import (
@@ -16,6 +15,8 @@ from google.auth.transport import requests as google_requests
 from api.serializers import CustomTokenObtainPairSerializer
 from django.conf import settings
 
+User = get_user_model()
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -23,11 +24,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 @api_view(["GET"])
 def version(request):
-    """
-    Returns the API version as a JSON response.
-    """
-    from rest_framework.response import Response
-
     version_info = {
         "version": "0.0.2",
         "status": "dev",
@@ -35,11 +31,6 @@ def version(request):
         "description": "dockerized django rest framework api",
     }
     return Response(version_info, status=status.HTTP_200_OK)
-
-
-# views.py
-
-User = get_user_model()
 
 
 @api_view(["POST"])
